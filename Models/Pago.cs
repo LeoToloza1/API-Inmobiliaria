@@ -16,14 +16,14 @@ namespace inmobiliaria
         public string? detalle { get; set; }
         public Contrato? Contrato { get; set; }
 
-        [NotMapped]
-        public DateOnly fecha_creado { get; set; }
-        [NotMapped]
-        public DateOnly fecha_editado { get; set; }
-        [NotMapped]
-        public Usuario? creado_usuario { get; set; }
-        [NotMapped]
-        public Usuario? editado_usuario { get; set; }
+        // [NotMapped]
+        // public DateOnly fecha_creado { get; set; }
+        // [NotMapped]
+        // public DateOnly fecha_editado { get; set; }
+        // [NotMapped]
+        // public Usuario? creado_usuario { get; set; }
+        // [NotMapped]
+        // public Usuario? editado_usuario { get; set; }
 
     }
 }

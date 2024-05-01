@@ -3,7 +3,8 @@ using inmobiliaria.Repositorios;
 using Microsoft.AspNetCore.Mvc;
 namespace inmobiliaria.Models
 {
-
+    [ApiController]
+    [Route("[controller]")]
     public class PagoController : Controller, IControladorBase<Pago>
     {
         private readonly RepositorioPago repositorioPago;
@@ -11,33 +12,70 @@ namespace inmobiliaria.Models
         {
             this.repositorioPago = repo;
         }
-
+        [HttpDelete("borrar/{id}")]
         public ActionResult<Pago> Delete(int id)
         {
-            throw new NotImplementedException();
+            return NotFound("Los pagos no se pueden eliminar");
         }
 
+        [HttpGet]
         public ActionResult<List<Pago>> Get()
         {
-            throw new NotImplementedException();
+            var pagos = repositorioPago.ObtenerTodos();
+            if (pagos == null)
+            {
+                return NotFound();
+            }
+            return pagos;
         }
-
+        [HttpGet("{id}")]
         public ActionResult<Pago> Get(int id)
         {
-            throw new NotImplementedException();
+            var pago = repositorioPago.BuscarPorId(id);
+            if (pago == null)
+            {
+                return NotFound();
+            }
+            return pago;
+        }
+        [HttpPost("guardar")]
+        public ActionResult<Pago> Post(Pago pago)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            repositorioPago.Crear(pago);
+            return Ok(pago);
         }
 
-        public ActionResult<Pago> Post(Pago t)
+        [HttpPut("actualizar/{id}")]
+        public ActionResult<Pago> Put(int id, Pago pago)
         {
-            throw new NotImplementedException();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState + ": El modelo no coincide con el esperado");
+            }
+
+            var pagoExistente = repositorioPago.BuscarPorId(id);
+            if (pagoExistente == null)
+            {
+                return NotFound();
+            }
+
+            if (pagoExistente.fecha_pago != DateOnly.FromDateTime(DateTime.Today))
+            {
+                return BadRequest("No se puede actualizar el pago porque la fecha de pago ya pasó.");
+            }
+
+            pagoExistente.importe = pago.importe != 0 ? pago.importe : pagoExistente.importe;
+            pagoExistente.estado = pago.estado;
+            pagoExistente.detalle = pago.detalle ?? pagoExistente.detalle;
+
+            repositorioPago.Actualizar(pagoExistente);
+            return Ok(pagoExistente);
         }
 
-        public ActionResult<Pago> Put(int id, Pago t)
-        {
-            throw new NotImplementedException();
-        }
+
     }
-
-
-
 }
