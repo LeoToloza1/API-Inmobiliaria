@@ -264,3 +264,8 @@ paket-files/
 __pycache__/
 *.pyc
 .vscode/*
+inmobiliaria.csproj
+inmobiliaria.http
+inmobiliaria.sln
+Properties/launchSettings.json
+.editorconfig
