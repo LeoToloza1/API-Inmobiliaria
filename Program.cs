@@ -25,9 +25,9 @@ builder.Services.AddScoped<RepositorioInmueble>();
 builder.Services.AddScoped<RepositorioPropietario>();
 builder.Services.AddScoped<RepositorioContrato>();
 builder.Services.AddScoped<RepositorioPago>();
+builder.Services.AddScoped<RepositorioTipoInmuebles>();
 
 //falta implementar:
-// builder.Services.AddScoped<RepositorioTipoInmueble>();
 // builder.Services.AddScoped<RepositorioCiudad>();
 // builder.Services.AddScoped<RepositorioZona>();
 // builder.Services.AddScoped<RepositorioUsuario>();

@@ -16,7 +16,7 @@ namespace inmobiliaria.Models
         public DbSet<Inquilino> Inquilino { get; set; }
         public DbSet<Usuario> Usuario { get; set; }
         public DbSet<Pago> Pago { get; set; }
-        public DbSet<TipoInmueble> tipo_inmueble { get; set; }
+        public DbSet<TipoInmueble> TipoInmueble { get; set; }
         /*
         Uso este metodo para convertir los enums a string, sino da este error:
         System.FormatException: The input string 'Disponible' was not in a correct format.
