@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace inmobiliaria.Models
 {
 
@@ -9,7 +11,12 @@ namespace inmobiliaria.Models
         public string? dni { get; set; }
         public string? email { get; set; }
         public string? telefono { get; set; }
+        public string? password { get; set; }
         public bool borrado { get; set; }
+        public string? avatarUrl { get; set; }
+        [NotMapped]
+        public IFormFile avatarFile { get; set; } = null!;
+
         public override string ToString()
         {
             return $"id: {id}, nombre: {nombre}, apellido: {apellido}, dni: {dni}, email: {email}, telefono: {telefono}, borrado: {borrado}";

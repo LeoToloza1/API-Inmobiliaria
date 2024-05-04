@@ -1,11 +1,13 @@
 using inmobiliaria.Models;
 using inmobiliaria.Repositorios;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace inmobiliaria.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
+    [Authorize(Policy = "Propietario")]
     public class ContratoController : ControllerBase, IControladorBase<Contrato>
     {
         private readonly RepositorioContrato repositorioContrato;

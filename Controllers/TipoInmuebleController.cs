@@ -1,11 +1,14 @@
+using System.ComponentModel.DataAnnotations;
 using inmobiliaria.Models;
 using inmobiliaria.Repositorios;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace inmobiliaria.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
+    [Authorize(Policy = "Propietario")]
     public class TipoInmuebleController : Controller
     {
         private readonly RepositorioTipoInmuebles repositorioTipoInmuebles;
@@ -16,11 +19,14 @@ namespace inmobiliaria.Controllers
         }
 
         [HttpGet]
+
         public ActionResult<List<TipoInmueble>> Get()
         {
+            Console.WriteLine("Acceso autorizado para Propietario.");
             return repositorioTipoInmuebles.ObtenerTodos();
         }
         [HttpPost("guardar")]
+
         public ActionResult<TipoInmueble> Post(TipoInmueble tipoInmueble)
         {
             if (!ModelState.IsValid)
