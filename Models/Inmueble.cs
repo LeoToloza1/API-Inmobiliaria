@@ -46,6 +46,11 @@ namespace inmobiliaria.Models
         [Display(Name = "Tipo Inmueble")]
 
         public TipoInmueble? tipoInmueble { set; get; }
+        public string? avatarUrl { get; set; }
+        // [Required(ErrorMessage = "El avatar es requerido")]
+        [NotMapped]
+        public IFormFile? avatarFile { get; set; }
+
         [Display(Name = "Mapa")]
         public string mapa => $"https://www.google.com/maps?q={coordenadas}";
         public override string ToString()

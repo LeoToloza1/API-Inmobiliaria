@@ -29,7 +29,7 @@ public class Auth
                     new Claim ("id", propietario.id.ToString()), //guardo el id del logueado
                     new Claim ("FullName" , propietario.nombre + " " + propietario.apellido) //guardo el nombre completo
             }),
-            Expires = DateTime.UtcNow.AddMinutes(60),
+            Expires = DateTime.UtcNow.AddDays(5),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
         //genero el token con las claims

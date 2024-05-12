@@ -12,20 +12,23 @@ using inmobiliaria.Servicio;
 
 namespace inmobiliaria.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     [AllowAnonymous]
     public class LoginController : ControllerBase
     {
         private readonly RepositorioPropietario _repositorio;
-        private readonly RepositorioUsuario _repoUsuario;
         private readonly Auth _auth;
+        private readonly EmailSender _emailSender;
+        private readonly IWebHostEnvironment hostingEnvironment;
 
-        public LoginController(Auth auth, RepositorioPropietario repositorio, RepositorioUsuario repoUsuario)
+
+        public LoginController(Auth auth, RepositorioPropietario repositorio, IWebHostEnvironment env, EmailSender emailSender)
         {
             _auth = auth;
             _repositorio = repositorio;
-            _repoUsuario = repoUsuario;
+            hostingEnvironment = env;
+            _emailSender = emailSender;
         }
         [HttpPost]
         public IActionResult Post(LoginModel loginModel)

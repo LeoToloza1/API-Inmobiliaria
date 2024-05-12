@@ -33,6 +33,7 @@ namespace inmobiliaria.Repositorios
 
         public Contrato BuscarPorId(int id)
         {
+
             var contrato = _contexto.Contrato
                 .Where(c => c.id == id && !c.borrado)
                 .Select(c => new Contrato
@@ -120,6 +121,27 @@ namespace inmobiliaria.Repositorios
                     inquilino = c.inquilino,
                     inmueble = c.inmueble
                 }).ToList();
+        }
+        public List<Contrato> ObtenerActivosPorPropietario(int propietarioId)
+        {
+#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+            return _contexto.Contrato
+                .Include(c => c.inmueble)
+                .Where(c => c.inmueble.propietario.id == propietarioId && !c.borrado)
+                .Select(c => new Contrato
+                {
+                    id = c.id,
+                    inquilinoid = c.inquilinoid,
+                    inmuebleid = c.inmuebleid,
+                    fecha_inicio = new DateOnly(c.fecha_inicio.Year, c.fecha_inicio.Month, c.fecha_inicio.Day),
+                    fecha_fin = new DateOnly(c.fecha_fin.Year, c.fecha_fin.Month, c.fecha_fin.Day),
+                    fecha_efectiva = new DateOnly(c.fecha_efectiva.Year, c.fecha_efectiva.Month, c.fecha_efectiva.Day),
+                    monto = c.monto,
+                    borrado = c.borrado,
+                    inquilino = c.inquilino,
+                    inmueble = c.inmueble
+                }).ToList();
+#pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
         }
     }
 

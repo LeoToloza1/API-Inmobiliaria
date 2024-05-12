@@ -2,6 +2,7 @@ using inmobiliaria.Repositorios;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.Security.Claims;
 
 namespace inmobiliaria.Models
 {
@@ -10,41 +11,80 @@ namespace inmobiliaria.Models
     [Authorize(Policy = "Propietario")]
     public class InmuebleController : ControllerBase
     {
+        private readonly IWebHostEnvironment hostingEnvironment;
         private readonly RepositorioInmueble repositorioInmueble;
-        public InmuebleController(RepositorioInmueble repositorioInmueble)
+        public InmuebleController(RepositorioInmueble repositorioInmueble, IWebHostEnvironment env)
         {
             this.repositorioInmueble = repositorioInmueble;
+            this.hostingEnvironment = env;
         }
-        [HttpGet]
+        [HttpGet] //devuelve todos los inmuebles del propietario logueado
         public ActionResult<List<Inmueble>> Get()
         {
-            var inmuebles = repositorioInmueble.ObtenerActivos();
+#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+
+            //este listado deberia estar en un gridLayout y al tocar en uno
+            //deberia acceder el endpoint siguiente: api/inmueble/propietario/{id}
+            var id = User.FindFirst("id").Value;
+            var inmuebles = repositorioInmueble.InmueblesDePropietario(int.Parse(id));
             if (inmuebles == null)
             {
                 return NotFound();
             }
             return inmuebles;
         }
-
-
         [HttpGet("{id}")]
         public ActionResult<Inmueble> Get(int id)
         {
+            //esto devuelve un inmueble por id, de un propietario logueado
+            var userId = User.FindFirst("id")?.Value;
             var inmueble = repositorioInmueble.BuscarPorId(id);
-            if (inmueble == null)
+            if (inmueble == null || inmueble.PropietarioId.ToString() != userId)
             {
                 return NotFound();
             }
+
             return inmueble;
         }
 
         [HttpPost("guardar")]
-        public ActionResult<Inmueble> Post(Inmueble inmueble)
+        public ActionResult<Inmueble> Post([FromForm] Inmueble inmueble, [FromForm] IFormFile avatarFile)
         {
+            var userId = User.FindFirst("id")?.Value;
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
+            if (avatarFile != null)
+            {
+                if (!ImagenValida(avatarFile))
+                {
+                    return BadRequest("El archivo proporcionado no es una imagen válida.");
+                }
+
+                string imgFolderPath = Path.Combine(hostingEnvironment.ContentRootPath, "img");
+                string folderPath = Path.Combine(imgFolderPath, "uploads");
+                Directory.CreateDirectory(imgFolderPath);
+                Directory.CreateDirectory(folderPath);
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(avatarFile.FileName);
+                var filePath = Path.Combine(folderPath, fileName);
+                try
+                {
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        avatarFile.CopyTo(stream);
+                    }
+                    inmueble.avatarUrl = Path.Combine("img", "uploads", fileName);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Error al guardar el archivo: {ex.Message}");
+                }
+            }
+
+#pragma warning disable CS8604 // Posible argumento de referencia nulo
+            inmueble.PropietarioId = int.Parse(userId);
+#pragma warning restore CS8604 // Posible argumento de referencia nulo
             repositorioInmueble.Crear(inmueble);
             return Ok(inmueble);
         }
@@ -52,6 +92,8 @@ namespace inmobiliaria.Models
         [HttpPut("actualizar/{id}")]
         public ActionResult<Inmueble> Put(int id, Inmueble inmueble)
         {
+            //esto actualiza un inmueble unicamente del propietario logueado
+            var userId = User.FindFirst("id")?.Value;
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState + ": El modelo no coincide con el esperado");
@@ -60,8 +102,9 @@ namespace inmobiliaria.Models
             {
                 return BadRequest("El ID proporcionado no coincide con el ID del Inmueble");
             }
+
             var inmuebleExistente = repositorioInmueble.BuscarPorId(id);
-            if (inmuebleExistente == null)
+            if (inmuebleExistente == null && inmuebleExistente.PropietarioId.ToString() != userId)
             {
                 return NotFound();
             }
@@ -81,22 +124,20 @@ namespace inmobiliaria.Models
 
         [HttpDelete("borrar/{id}")]
         public ActionResult<Inmueble> Delete(int id)
-        {
+        {//elimina solo el usuario logueado
+            var userId = User.FindFirst("id")?.Value;
             var inmueble = repositorioInmueble.BuscarPorId(id);
-            if (inmueble == null)
+            if (inmueble == null || inmueble.PropietarioId.ToString() != userId)
             {
                 return NotFound();
             }
-
             var exito = repositorioInmueble.EliminadoLogico(id);
             if (!exito)
             {
                 return StatusCode(500, "Error al eliminar");
             }
-
             return NoContent();
         }
-
         [HttpGet("propietario/{id}")]
         public ActionResult<List<Inmueble>> GetPropietario(int id)
         {
@@ -107,6 +148,61 @@ namespace inmobiliaria.Models
             }
             return inmuebles;
         }
+        [HttpPatch("actualizar/avatar/{id}")]
+        public ActionResult<Inmueble> CambiarAvatar(int id, IFormFile avatarFile)
+        {
+            if (avatarFile == null)
+            {
+                return BadRequest("Debe proporcionar un archivo de imagen.");
+            }
+
+            var inmuebleExistente = repositorioInmueble.BuscarPorId(id);
+            if (inmuebleExistente == null)
+            {
+                return NotFound();
+            }
+
+            if (!ImagenValida(avatarFile))
+            {
+                return BadRequest("El archivo proporcionado no es una imagen válida.");
+            }
+
+            string imgFolderPath = Path.Combine(hostingEnvironment.ContentRootPath, "img");
+            string folderPath = Path.Combine(imgFolderPath, "uploads");
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(avatarFile.FileName);
+
+            try
+            {
+                Directory.CreateDirectory(folderPath);
+                var filePath = Path.Combine(folderPath, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    avatarFile.CopyTo(stream);
+                }
+                inmuebleExistente.avatarUrl = Path.Combine("img", "uploads", fileName);
+                bool exito = repositorioInmueble.CambiarAvatar(id, inmuebleExistente.avatarUrl);
+
+                if (!exito)
+                {
+                    return StatusCode(500, "Error al actualizar el avatar en la base de datos");
+                }
+
+                return Ok(inmuebleExistente);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al guardar el archivo: {ex.Message}");
+            }
+        }
+        private bool ImagenValida(IFormFile file)
+        {
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            // Validacion de las extensiones 
+            string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif" };
+            return allowedExtensions.Contains(extension);
+        }
+
 
     }
 }

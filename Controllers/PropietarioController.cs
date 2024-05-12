@@ -10,15 +10,16 @@ namespace inmobiliaria.Models
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PropietarioController : ControllerBase
     {
         private readonly RepositorioPropietario repositorioPropietario;
+        private readonly EmailSender _emailSender;
         private readonly IWebHostEnvironment hostingEnvironment;
-        public PropietarioController(RepositorioPropietario repo, IWebHostEnvironment env)
+        public PropietarioController(RepositorioPropietario repo, IWebHostEnvironment env, EmailSender emailSender)
         {
             repositorioPropietario = repo;
             hostingEnvironment = env;
+            _emailSender = emailSender;
 
         }
         [HttpGet]
@@ -42,7 +43,6 @@ namespace inmobiliaria.Models
             return propietario;
         }
         [HttpPost]
-        [AllowAnonymous]
         public ActionResult<Propietario> Post([FromForm] Propietario propietario, [FromForm] IFormFile avatarFile)
         {
 #pragma warning disable CS8604 // Posible argumento de referencia nulo
@@ -80,8 +80,6 @@ namespace inmobiliaria.Models
             }
             return Ok(propietario);
         }
-
-
         [HttpPut("actualizar/{id}")]
         public ActionResult<Propietario> Put(int id, Propietario propietario)
         {
@@ -196,6 +194,7 @@ namespace inmobiliaria.Models
             string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif" };
             return allowedExtensions.Contains(extension);
         }
+
 
     }
 }

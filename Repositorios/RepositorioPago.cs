@@ -4,7 +4,7 @@ using Repositorios;
 
 namespace inmobiliaria.Repositorios
 {
-    public class RepositorioPago : IRepositorio<Pago>
+    public class RepositorioPago
     {
         private readonly DataContext _contexto;
         public RepositorioPago(DataContext contexto)
@@ -84,9 +84,10 @@ namespace inmobiliaria.Repositorios
             throw new NotImplementedException();
         }
 
-        public List<Pago> ObtenerTodos()
+        public List<Pago> ObtenerTodos(int propietarioId)
         {
             return _contexto.Pago
+                .Where(p => p.Contrato != null && p.Contrato.inmueble != null && p.Contrato.inmueble.PropietarioId == propietarioId)
                 .Select(c => new Pago
                 {
                     id = c.id,

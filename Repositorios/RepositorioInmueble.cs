@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace inmobiliaria.Repositorios
 {
-    public class RepositorioInmueble : IRepositorio<Inmueble>
+    public class RepositorioInmueble
     {
         private readonly DataContext _contexto;
 
@@ -96,6 +96,27 @@ namespace inmobiliaria.Repositorios
         public List<Inmueble> ObtenerActivos()
         {
             return _contexto.Inmueble.Where(i => !i.borrado).ToList();
+        }
+        public bool CambiarAvatar(int inmuebleId, string nuevoAvatar)
+        {
+            try
+            {
+                var inmueble = _contexto.Inmueble.FirstOrDefault(u => u.id == inmuebleId);
+                if (inmueble == null)
+                {
+                    Console.WriteLine("No se encontró el inmueble.");
+                    return false;
+                }
+                inmueble.avatarUrl = nuevoAvatar;
+                _contexto.SaveChanges();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al cambiar el avatar: {ex.Message}");
+                return false;
+            }
         }
     }
 }

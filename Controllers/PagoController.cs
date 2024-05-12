@@ -7,12 +7,20 @@ namespace inmobiliaria.Models
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Policy = "Propietario")]
-    public class PagoController : Controller, IControladorBase<Pago>
+    public class PagoController : Controller
     {
         private readonly RepositorioPago repositorioPago;
         public PagoController(RepositorioPago repo)
         {
             this.repositorioPago = repo;
+        }
+        private int GetPropietarioId()
+        {
+#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+            var userIdClaim = User.FindFirst("id").Value;
+#pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
+            int userId = int.Parse(userIdClaim);
+            return userId;
         }
         [HttpDelete("borrar/{id}")]
         public ActionResult<Pago> Delete(int id)
@@ -23,23 +31,37 @@ namespace inmobiliaria.Models
         [HttpGet]
         public ActionResult<List<Pago>> Get()
         {
-            var pagos = repositorioPago.ObtenerTodos();
+            var propietarioId = GetPropietarioId();
+            if (propietarioId == -1)
+            {
+                return BadRequest("No se pudo obtener el ID del propietario.");
+            }
+
+            var pagos = repositorioPago.ObtenerTodos(propietarioId);
             if (pagos == null)
             {
                 return NotFound();
             }
             return pagos;
         }
+
         [HttpGet("{id}")]
         public ActionResult<Pago> Get(int id)
         {
+            var propietarioId = GetPropietarioId();
+            if (propietarioId == -1)
+            {
+                return BadRequest("No se pudo obtener el ID del propietario.");
+            }
+
             var pago = repositorioPago.BuscarPorId(id);
-            if (pago == null)
+            if (pago == null || pago.Contrato?.inmueble?.PropietarioId != propietarioId)
             {
                 return NotFound();
             }
             return pago;
         }
+
         [HttpPost("guardar")]
         public ActionResult<Pago> Post(Pago pago)
         {
@@ -60,12 +82,14 @@ namespace inmobiliaria.Models
             }
 
             var pagoExistente = repositorioPago.BuscarPorId(id);
-            if (pagoExistente == null)
+#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+            if (pagoExistente == null || pagoExistente.Contrato.inmueble.PropietarioId != GetPropietarioId())
             {
                 return NotFound();
             }
+#pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
 
-            if (pagoExistente.fecha_pago != DateOnly.FromDateTime(DateTime.Today))
+            if (pagoExistente.fecha_pago != new DateOnly())
             {
                 return BadRequest("No se puede actualizar el pago porque la fecha de pago ya pasó.");
             }
@@ -77,7 +101,5 @@ namespace inmobiliaria.Models
             repositorioPago.Actualizar(pagoExistente);
             return Ok(pagoExistente);
         }
-
-
     }
 }

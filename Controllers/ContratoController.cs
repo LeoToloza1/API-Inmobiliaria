@@ -2,24 +2,42 @@ using inmobiliaria.Models;
 using inmobiliaria.Repositorios;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace inmobiliaria.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Policy = "Propietario")]
-    public class ContratoController : ControllerBase, IControladorBase<Contrato>
+    public class ContratoController : ControllerBase
     {
         private readonly RepositorioContrato repositorioContrato;
+
         public ContratoController(RepositorioContrato repo)
         {
             this.repositorioContrato = repo;
         }
+
+        private int GetPropietarioId()
+        {
+#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+            var userIdClaim = User.FindFirst("id").Value;
+#pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
+            int userId = int.Parse(userIdClaim);
+            return userId;
+        }
+
         [HttpDelete("borrar/{id}")]
         public ActionResult<Contrato> Delete(int id)
         {
+            var propietarioId = GetPropietarioId();
+            if (propietarioId == -1)
+            {
+                return BadRequest("No se pudo obtener el ID del propietario.");
+            }
+
             var contrato = repositorioContrato.BuscarPorId(id);
-            if (contrato == null)
+            if (contrato == null || contrato.inmueble?.PropietarioId != propietarioId)
             {
                 return NotFound();
             }
@@ -31,28 +49,44 @@ namespace inmobiliaria.Controllers
             }
 
             return NoContent();
-
         }
+
         [HttpGet]
         public ActionResult<List<Contrato>> Get()
         {
-            var contratos = repositorioContrato.ObtenerActivos();
+            var propietarioId = GetPropietarioId();
+            if (propietarioId == -1)
+            {
+                return BadRequest("No se pudo obtener el ID del propietario.");
+            }
+
+            var contratos = repositorioContrato.ObtenerActivosPorPropietario(propietarioId);
             if (contratos == null)
             {
                 return NotFound();
             }
+
             return contratos;
         }
+
         [HttpGet("{id}")]
         public ActionResult<Contrato> Get(int id)
         {
+            var propietarioId = GetPropietarioId();
+            if (propietarioId == -1)
+            {
+                return BadRequest("No se pudo obtener el ID del propietario.");
+            }
+
             var contrato = repositorioContrato.BuscarPorId(id);
-            if (contrato == null)
+            if (contrato == null || contrato.inmueble?.PropietarioId != propietarioId)
             {
                 return NotFound();
             }
+
             return contrato;
         }
+
         [HttpPost("guardar")]
         public ActionResult<Contrato> Post(Contrato contrato)
         {
@@ -76,7 +110,7 @@ namespace inmobiliaria.Controllers
             }
 
             var contratoExistente = repositorioContrato.BuscarPorId(id);
-            if (contratoExistente == null)
+            if (contratoExistente == null || contratoExistente.inmueble?.PropietarioId != GetPropietarioId())
             {
                 return NotFound();
             }
@@ -95,10 +129,5 @@ namespace inmobiliaria.Controllers
                 return BadRequest("No se puede actualizar el contrato porque la fecha de inicio no es hoy.");
             }
         }
-
-
     }
-
-
-
 }

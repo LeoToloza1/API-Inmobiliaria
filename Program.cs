@@ -35,11 +35,6 @@ builder.Services.AddScoped<RepositorioTipoInmuebles>();
 builder.Services.AddScoped<Auth>();
 builder.Services.AddScoped<EmailSender>();
 builder.Services.AddScoped<RepositorioUsuario>();
-
-//falta implementar:
-// builder.Services.AddScoped<RepositorioCiudad>();
-// builder.Services.AddScoped<RepositorioZona>();
-
 builder.Services.AddSwaggerGen();
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
@@ -73,7 +68,6 @@ else
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Propietario", policy => policy.RequireRole("Propietario"));
-    // options.AddPolicy("Administrador", policy => policy.RequireRole("Administrador"));
 });
 var app = builder.Build();
 
