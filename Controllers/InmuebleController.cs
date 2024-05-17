@@ -48,7 +48,7 @@ namespace inmobiliaria.Models
         }
 
         [HttpPost("guardar")]
-        public ActionResult<Inmueble> Post([FromForm] Inmueble inmueble, [FromForm] IFormFile avatarFile)
+        public ActionResult<Inmueble> Post([FromBody] Inmueble inmueble, IFormFile avatarFile)
         {
             var userId = User.FindFirst("id")?.Value;
             if (!ModelState.IsValid)
@@ -61,13 +61,11 @@ namespace inmobiliaria.Models
                 {
                     return BadRequest("El archivo proporcionado no es una imagen válida.");
                 }
-
-                string imgFolderPath = Path.Combine(hostingEnvironment.ContentRootPath, "img");
-                string folderPath = Path.Combine(imgFolderPath, "uploads");
-                Directory.CreateDirectory(imgFolderPath);
-                Directory.CreateDirectory(folderPath);
+                string uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "img", "uploads");
+                Directory.CreateDirectory(uploadsFolder); // Crear la carpeta si no existe
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(avatarFile.FileName);
-                var filePath = Path.Combine(folderPath, fileName);
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
                 try
                 {
                     using (var stream = new FileStream(filePath, FileMode.Create))
@@ -203,6 +201,15 @@ namespace inmobiliaria.Models
             return allowedExtensions.Contains(extension);
         }
 
-
+        [HttpPatch("habilitar/{id}")]
+        public IActionResult habilitar(int id)
+        {
+            var inmueble = repositorioInmueble.habilitar(id);
+            if (inmueble == null)
+            {
+                return NotFound("No se encontró el inmueble, intente de");
+            }
+            return Ok(inmueble);
+        }
     }
 }

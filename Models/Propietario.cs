@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace inmobiliaria.Models
@@ -14,8 +15,9 @@ namespace inmobiliaria.Models
         public string? password { get; set; }
         public bool borrado { get; set; }
         public string? avatarUrl { get; set; }
+
         [NotMapped]
-        public IFormFile avatarFile { get; set; } = null!;
+        public IFormFile? avatarFile { get; set; }
 
         public override string ToString()
         {

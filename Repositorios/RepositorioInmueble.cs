@@ -118,5 +118,23 @@ namespace inmobiliaria.Repositorios
                 return false;
             }
         }
+
+        public Inmueble habilitar(int id)
+        {
+            var inmueble = _contexto.Inmueble.FirstOrDefault(i => i.id == id);
+            if (inmueble?.estado == "Retirado")
+            {
+                inmueble.estado = "Disponible";
+            }
+            else
+            {
+#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+                inmueble.estado = "Retirado";
+#pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
+            }
+            _contexto.SaveChanges();
+            return inmueble;
+        }
+
     }
 }

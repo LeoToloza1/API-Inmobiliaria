@@ -19,16 +19,10 @@ namespace inmobiliaria.Controllers
     {
         private readonly RepositorioPropietario _repositorio;
         private readonly Auth _auth;
-        private readonly EmailSender _emailSender;
-        private readonly IWebHostEnvironment hostingEnvironment;
-
-
-        public LoginController(Auth auth, RepositorioPropietario repositorio, IWebHostEnvironment env, EmailSender emailSender)
+        public LoginController(Auth auth, RepositorioPropietario repositorio)
         {
             _auth = auth;
             _repositorio = repositorio;
-            hostingEnvironment = env;
-            _emailSender = emailSender;
         }
         [HttpPost]
         public IActionResult Post(LoginModel loginModel)
@@ -48,5 +42,12 @@ namespace inmobiliaria.Controllers
             return NotFound(new { message = "Correo electrónico o contraseña incorrectos" });
         }
 
+        [HttpGet]
+        public IActionResult LogOut()
+        {
+            HttpContext.Session.Clear();
+            HttpContext.Response.Cookies.Delete("jwt");
+            return Ok("Sesión cerrada");
+        }
     }
 }
