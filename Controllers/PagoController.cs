@@ -22,12 +22,6 @@ namespace inmobiliaria.Models
             int userId = int.Parse(userIdClaim);
             return userId;
         }
-        [HttpDelete("borrar/{id}")]
-        public ActionResult<Pago> Delete(int id)
-        {
-            return NotFound("Los pagos no se pueden eliminar");
-        }
-
         [HttpGet]
         public ActionResult<List<Pago>> Get()
         {
@@ -91,7 +85,7 @@ namespace inmobiliaria.Models
 
             if (pagoExistente.fecha_pago != new DateOnly())
             {
-                return BadRequest("No se puede actualizar el pago porque la fecha de pago ya pasó.");
+                return BadRequest("No se puede actualizar el pago, solo es posible unicamente el mismo día de pago");
             }
 
             pagoExistente.importe = pago.importe != 0 ? pago.importe : pagoExistente.importe;

@@ -23,28 +23,26 @@ namespace inmobiliaria.Models
             _hostingEnvironment = hostingEnvironment;
         }
 
-        [HttpPost("recovery")]
-        public IActionResult Recovery(string email)
+        [HttpPost]
+        public IActionResult Recovery([FromForm] string email)
         {
             try
             {
-                var entidad = _repositorio.ObtenerPorEmail(email);
-                var dominio = _hostingEnvironment.IsDevelopment() ? HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString() : "www.misitio.com";
+                var propietario = _repositorio.ObtenerPorEmail(email);
+                var dominio = _hostingEnvironment.IsDevelopment() ? HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString() : "www.inmobiliaria.com";
 
-                if (entidad != null)
+                if (propietario != null)
                 {
                     string token = GeneratePasswordResetToken();
-                    string resetPasswordLink = $"http://{dominio}/reset-password?token={token}";
-                    string mensajeHtml = $@"<h1>Restablecer contraseña</h1>
-                                    <p>Hemos recibido una solicitud para restablecer tu contraseña. Haz clic en el siguiente enlace para crear una nueva contraseña:</p>
-                                    <a href='{resetPasswordLink}'>Restablecer contraseña</a>";
+                    string templatePath = Path.Combine(_hostingEnvironment.ContentRootPath, "EmailTemplate.html");
+                    string templateContent = System.IO.File.ReadAllText(templatePath);
+                    string mensajeHtml = templateContent.Replace("{{Token}}", token).Replace("{{Nombre}}", propietario.nombre);
 #pragma warning disable CS8604 // Posible argumento de referencia nulo
-                    bool enviado = _emailSender.SendEmail(entidad.email, "Restablecer Contraseña", mensajeHtml);
-#pragma warning restore CS8604 // Posible argumento de referencia nulo
-
+                    bool enviado = _emailSender.SendEmail(propietario.email, "Restablecer Contraseña", mensajeHtml);
                     if (enviado)
                     {
-                        return Ok("Se ha enviado un correo electrónico con instrucciones para restablecer la contraseña.");
+                        _repositorio.CambiarPass(propietario.id, token);
+                        return Ok("Se ha enviado un correo electrónico con una nueva contraseña, por favor revise su correo.");
                     }
                     else
                     {

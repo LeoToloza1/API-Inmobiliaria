@@ -28,18 +28,25 @@ namespace inmobiliaria.Controllers
         public IActionResult Post(LoginModel loginModel)
         {
 #pragma warning disable CS8604 // Posible argumento de referencia nulo
-            var p = _repositorio.ObtenerPorEmail(loginModel.Email);
+            try
+            {
+                var p = _repositorio.ObtenerPorEmail(loginModel.Email);
 
-            if (p == null)
-            {
-                return NotFound(new { message = "Ocurrio un error intente de nuevo" });
+                if (p == null)
+                {
+                    return NotFound("Ocurrio un error intente de nuevo");
+                }
+                if (HashPass.VerificarPassword(loginModel.Password, p.password))
+                {
+                    var tokenGenerado = _auth.GenerarToken(p);
+                    return Ok(new { tokenGenerado });
+                }
             }
-            if (HashPass.VerificarPassword(loginModel.Password, p.password))
+            catch
             {
-                var tokenGenerado = _auth.GenerarToken(p);
-                return Ok(new { tokenGenerado });
+                return NotFound("Correo electrónico o contraseña incorrectos");
             }
-            return NotFound(new { message = "Correo electrónico o contraseña incorrectos" });
+            return NotFound("Correo electrónico o contraseña incorrectos");
         }
 
         [HttpGet]

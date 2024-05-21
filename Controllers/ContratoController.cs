@@ -129,5 +129,28 @@ namespace inmobiliaria.Controllers
                 return BadRequest("No se puede actualizar el contrato porque la fecha de inicio no es hoy.");
             }
         }
+        [HttpGet("alquilados")]
+        public ActionResult<List<Contrato>> GetAlquilados()
+        {
+            var userId = GetPropietarioId();
+            if (userId == 0)
+            {
+                return BadRequest("Usuario inválido.");
+            }
+
+            var inmuebles = repositorioContrato.InmueblesAlquilados(userId);
+
+            if (inmuebles == null)
+            {
+                return NotFound("No se encontraron inmuebles alquilados.");
+            }
+            else if (inmuebles.Count == 0)
+            {
+                return NotFound("No tiene inmuebles alquilados.");
+            }
+
+            return inmuebles;
+        }
+
     }
 }

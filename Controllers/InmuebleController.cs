@@ -18,6 +18,14 @@ namespace inmobiliaria.Models
             this.repositorioInmueble = repositorioInmueble;
             this.hostingEnvironment = env;
         }
+        private int GetPropietarioId()
+        {
+#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+            var userIdClaim = User.FindFirst("id").Value;
+#pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
+            int userId = int.Parse(userIdClaim);
+            return userId;
+        }
         [HttpGet] //devuelve todos los inmuebles del propietario logueado
         public ActionResult<List<Inmueble>> Get()
         {
@@ -48,31 +56,34 @@ namespace inmobiliaria.Models
         }
 
         [HttpPost("guardar")]
-        public ActionResult<Inmueble> Post([FromBody] Inmueble inmueble, IFormFile avatarFile)
+        public ActionResult<Inmueble> Post([FromForm] Inmueble inmueble, [FromForm] IFormFile img)
         {
             var userId = User.FindFirst("id")?.Value;
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                Console.WriteLine(ModelState.ErrorCount);
+
+                Console.WriteLine("No se pudo agregar el inmueble");
+                return BadRequest(ModelState);
             }
-            if (avatarFile != null)
+            if (img != null)
             {
-                if (!ImagenValida(avatarFile))
+                if (!ImagenValida(img))
                 {
                     return BadRequest("El archivo proporcionado no es una imagen válida.");
                 }
                 string uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "img", "uploads");
                 Directory.CreateDirectory(uploadsFolder); // Crear la carpeta si no existe
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(avatarFile.FileName);
+                var fileName = img.FileName;
                 var filePath = Path.Combine(uploadsFolder, fileName);
 
                 try
                 {
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        avatarFile.CopyTo(stream);
+                        img.CopyTo(stream);
                     }
-                    inmueble.avatarUrl = Path.Combine("img", "uploads", fileName);
+                    inmueble.avatarUrl = fileName;
                 }
                 catch (Exception ex)
                 {
@@ -82,6 +93,7 @@ namespace inmobiliaria.Models
 
 #pragma warning disable CS8604 // Posible argumento de referencia nulo
             inmueble.PropietarioId = int.Parse(userId);
+            inmueble.estado = "Retirado";
 #pragma warning restore CS8604 // Posible argumento de referencia nulo
             repositorioInmueble.Crear(inmueble);
             return Ok(inmueble);
@@ -210,6 +222,22 @@ namespace inmobiliaria.Models
                 return NotFound("No se encontró el inmueble, intente de");
             }
             return Ok(inmueble);
+        }
+
+        [HttpGet("alquilados")]
+        public ActionResult<List<Inmueble>> GetAlquilados()
+        {
+            var userId = GetPropietarioId();
+            if (userId == 0)
+            {
+                return BadRequest("Usuario invalido.");
+            }
+            var inmuebles = repositorioInmueble.InmueblesAlquilados(userId);
+            if (inmuebles == null || inmuebles.Count == 0)
+            {
+                return NotFound();
+            }
+            return inmuebles;
         }
     }
 }

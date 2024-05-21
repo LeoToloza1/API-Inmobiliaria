@@ -47,8 +47,7 @@ namespace inmobiliaria.Models
 
         public TipoInmueble? tipoInmueble { set; get; }
         public string? avatarUrl { get; set; }
-        // [Required(ErrorMessage = "El avatar es requerido")]
-        [Required(ErrorMessage = "El avatar es requerido")]
+
         [NotMapped]
         public IFormFile? avatarFile { get; set; }
 

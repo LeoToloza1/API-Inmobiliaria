@@ -136,5 +136,18 @@ namespace inmobiliaria.Repositorios
             return inmueble;
         }
 
+        public List<Inmueble> InmueblesAlquilados(int propietarioId)
+        {
+
+            var inmueblesAlquilados = _contexto.Inmueble
+
+                .Where(i => i.PropietarioId == propietarioId)
+                .Include(i => i.propietario)
+                .Include(i => i.tipoInmueble)
+                .ToList();
+
+            return inmueblesAlquilados;
+        }
+
     }
 }
