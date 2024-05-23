@@ -40,7 +40,7 @@ namespace inmobiliaria.Models
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Pago> Get(int id)
+        public ActionResult<List<Pago>> GetPagosPorContrato(int id)
         {
             var propietarioId = GetPropietarioId();
             if (propietarioId == -1)
@@ -48,52 +48,54 @@ namespace inmobiliaria.Models
                 return BadRequest("No se pudo obtener el ID del propietario.");
             }
 
-            var pago = repositorioPago.BuscarPorId(id);
-            if (pago == null || pago.Contrato?.inmueble?.PropietarioId != propietarioId)
+            var pagos = repositorioPago.BuscarPagosPorContratoId(id);
+            if (pagos == null || pagos.Count == 0 || pagos[0].Contrato?.inmueble?.PropietarioId != propietarioId)
             {
                 return NotFound();
             }
-            return pago;
+
+            return pagos;
         }
 
-        [HttpPost("guardar")]
-        public ActionResult<Pago> Post(Pago pago)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-            repositorioPago.Crear(pago);
-            return Ok(pago);
-        }
 
-        [HttpPut("actualizar/{id}")]
-        public ActionResult<Pago> Put(int id, Pago pago)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState + ": El modelo no coincide con el esperado");
-            }
+        // [HttpPost("guardar")]
+        // public ActionResult<Pago> Post(Pago pago)
+        // {
+        //     if (!ModelState.IsValid)
+        //     {
+        //         return BadRequest();
+        //     }
+        //     repositorioPago.Crear(pago);
+        //     return Ok(pago);
+        // }
 
-            var pagoExistente = repositorioPago.BuscarPorId(id);
-#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
-            if (pagoExistente == null || pagoExistente.Contrato.inmueble.PropietarioId != GetPropietarioId())
-            {
-                return NotFound();
-            }
-#pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
+        //         [HttpPut("actualizar/{id}")]
+        //         public ActionResult<Pago> Put(int id, Pago pago)
+        //         {
+        //             if (!ModelState.IsValid)
+        //             {
+        //                 return BadRequest(ModelState + ": El modelo no coincide con el esperado");
+        //             }
 
-            if (pagoExistente.fecha_pago != new DateOnly())
-            {
-                return BadRequest("No se puede actualizar el pago, solo es posible unicamente el mismo día de pago");
-            }
+        //             var pagoExistente = repositorioPago.BuscarPorId(id);
+        // #pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+        //             if (pagoExistente == null || pagoExistente.Contrato.inmueble.PropietarioId != GetPropietarioId())
+        //             {
+        //                 return NotFound();
+        //             }
+        // #pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
 
-            pagoExistente.importe = pago.importe != 0 ? pago.importe : pagoExistente.importe;
-            pagoExistente.estado = pago.estado;
-            pagoExistente.detalle = pago.detalle ?? pagoExistente.detalle;
+        //             if (pagoExistente.fecha_pago != new DateOnly())
+        //             {
+        //                 return BadRequest("No se puede actualizar el pago, solo es posible unicamente el mismo día de pago");
+        //             }
 
-            repositorioPago.Actualizar(pagoExistente);
-            return Ok(pagoExistente);
-        }
+        //             pagoExistente.importe = pago.importe != 0 ? pago.importe : pagoExistente.importe;
+        //             pagoExistente.estado = pago.estado;
+        //             pagoExistente.detalle = pago.detalle ?? pagoExistente.detalle;
+
+        //             repositorioPago.Actualizar(pagoExistente);
+        //             return Ok(pagoExistente);
+        //         }
     }
 }

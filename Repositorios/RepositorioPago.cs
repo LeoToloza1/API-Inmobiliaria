@@ -26,12 +26,10 @@ namespace inmobiliaria.Repositorios
                 return false;
             }
         }
-
-        public Pago BuscarPorId(int id)
+        public List<Pago> BuscarPagosPorContratoId(int contratoId)
         {
-#pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
             return _contexto.Pago
-                .Where(p => p.id == id)
+                .Where(p => p.contratoid == contratoId)
                 .Select(c => new Pago
                 {
                     id = c.id,
@@ -53,9 +51,9 @@ namespace inmobiliaria.Repositorios
                         inmueble = c.Contrato.inmueble
                     } : null
                 })
-                .FirstOrDefault();
-#pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
+                .ToList();
         }
+
 
         public bool Crear(Pago pago)
         {
@@ -111,6 +109,7 @@ namespace inmobiliaria.Repositorios
                     } : null
                 }).ToList();
         }
+
 
     }
 }

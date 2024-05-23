@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 01-05-2024 a las 23:04:20
+-- Tiempo de generación: 24-05-2024 a las 01:00:54
 -- Versión del servidor: 10.4.25-MariaDB
 -- Versión de PHP: 8.1.10
 
@@ -20,8 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `inmobiliaria`
 --
-CREATE DATABASE IF NOT EXISTS `inmobiliaria` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `inmobiliaria`;
 
 DELIMITER $$
 --
@@ -381,8 +379,8 @@ DELIMITER ;
 --
 
 DROP TABLE IF EXISTS `contrato`;
-CREATE TABLE IF NOT EXISTS `contrato` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `contrato` (
+  `id` int(11) NOT NULL,
   `id_inquilino` int(11) NOT NULL,
   `id_inmueble` int(11) NOT NULL,
   `fecha_inicio` date DEFAULT NULL,
@@ -391,36 +389,21 @@ CREATE TABLE IF NOT EXISTS `contrato` (
   `monto` decimal(9,2) DEFAULT NULL,
   `borrado` tinyint(1) DEFAULT 0,
   `creado_fecha` datetime NOT NULL DEFAULT current_timestamp(),
-  `creado_usuario` int(11) NOT NULL,
-  `cancelado_fecha` datetime DEFAULT NULL,
-  `cancelado_usuario` int(11) NOT NULL,
-  `editado_usuario` int(2) DEFAULT NULL,
-  `editado_fecha` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `contrato_inmueble_idx` (`id_inmueble`),
-  KEY `contrato_inquilino_idx` (`id_inquilino`),
-  KEY `fecha_inicio` (`fecha_inicio`,`fecha_fin`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
-
---
--- RELACIONES PARA LA TABLA `contrato`:
---   `id_inmueble`
---       `inmueble` -> `id`
---   `id_inquilino`
---       `inquilino` -> `id`
---
+  `cancelado_fecha` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `contrato`
 --
 
-INSERT INTO `contrato` (`id`, `id_inquilino`, `id_inmueble`, `fecha_inicio`, `fecha_fin`, `fecha_efectiva`, `monto`, `borrado`, `creado_fecha`, `creado_usuario`, `cancelado_fecha`, `cancelado_usuario`, `editado_usuario`, `editado_fecha`) VALUES
-(1, 1, 1, '2023-04-23', '2024-04-30', '2024-04-30', '1500.00', 0, '2024-04-23 01:47:34', 0, '2024-04-24 16:31:44', 0, 0, NULL),
-(2, 3, 1, '2023-04-23', '2025-04-23', '2025-04-23', '23425.00', 0, '2024-04-23 01:49:19', 0, '2024-04-23 01:53:57', 0, 0, NULL),
-(3, 1, 1, '2024-04-26', '2025-04-25', '2025-04-25', '2500.00', 0, '2024-04-23 02:04:46', 0, '2024-04-23 02:04:46', 0, 0, NULL),
-(4, 4, 3, '2024-04-25', '2024-04-30', '2024-04-30', '1000.00', 0, '2024-04-24 22:10:10', 0, NULL, 0, NULL, NULL),
-(5, 4, 10, '2024-05-01', '2024-05-01', '2024-05-01', '5000.00', 1, '2024-04-25 12:15:10', 2, NULL, 0, 2, '2024-04-25 12:22:08'),
-(6, 1, 1, '2024-05-01', '2025-05-01', '0001-01-01', '6000.00', 0, '2024-05-01 17:31:34', 0, NULL, 0, NULL, NULL);
+INSERT INTO `contrato` (`id`, `id_inquilino`, `id_inmueble`, `fecha_inicio`, `fecha_fin`, `fecha_efectiva`, `monto`, `borrado`, `creado_fecha`, `cancelado_fecha`) VALUES
+(1, 3, 1, '2022-04-23', '2023-04-30', '0001-01-01', '1500.00', 0, '2024-04-23 01:47:34', '2024-04-24 16:31:44'),
+(2, 3, 1, '2023-04-23', '2025-04-23', '2025-04-23', '23425.00', 0, '2024-04-23 01:49:19', '2024-04-23 01:53:57'),
+(3, 6, 9, '2024-04-26', '2025-04-25', '2025-04-25', '2500.00', 0, '2024-04-23 02:04:46', '2024-04-23 02:04:46'),
+(4, 4, 3, '2024-04-25', '2024-04-30', '2024-04-30', '1000.00', 0, '2024-04-24 22:10:10', NULL),
+(5, 4, 10, '2024-05-01', '2024-05-01', '2024-05-01', '5000.00', 1, '2024-04-25 12:15:10', NULL),
+(6, 6, 11, '2024-05-01', '2025-05-01', '2025-05-01', '6000.00', 0, '2024-05-01 17:31:34', NULL),
+(7, 4, 4, '2024-05-23', '2025-05-31', NULL, '150000.00', 0, '2024-05-23 19:53:51', NULL);
 
 -- --------------------------------------------------------
 
@@ -429,8 +412,8 @@ INSERT INTO `contrato` (`id`, `id_inquilino`, `id_inmueble`, `fecha_inicio`, `fe
 --
 
 DROP TABLE IF EXISTS `inmueble`;
-CREATE TABLE IF NOT EXISTS `inmueble` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `inmueble` (
+  `id` int(11) NOT NULL,
   `direccion` varchar(100) NOT NULL COMMENT 'calle y altura',
   `uso` enum('Comercial','Residencial') NOT NULL DEFAULT 'Comercial',
   `id_tipo` int(11) NOT NULL,
@@ -438,38 +421,31 @@ CREATE TABLE IF NOT EXISTS `inmueble` (
   `coordenadas` varchar(100) DEFAULT NULL,
   `precio` decimal(11,2) DEFAULT NULL,
   `id_propietario` int(11) NOT NULL,
-  `estado` enum('Disponible','Retirado') NOT NULL DEFAULT 'Disponible',
+  `estado` enum('Disponible','Retirado') DEFAULT 'Retirado',
   `borrado` tinyint(1) NOT NULL DEFAULT 0,
   `descripcion` text DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `inmueble_tipo_idx` (`id_tipo`),
-  KEY `propietario_inmueble_idx` (`id_propietario`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
-
---
--- RELACIONES PARA LA TABLA `inmueble`:
---   `id_tipo`
---       `tipo_inmueble` -> `id`
---   `id_propietario`
---       `propietario` -> `id`
---
+  `avatarUrl` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `inmueble`
 --
 
-INSERT INTO `inmueble` (`id`, `direccion`, `uso`, `id_tipo`, `ambientes`, `coordenadas`, `precio`, `id_propietario`, `estado`, `borrado`, `descripcion`) VALUES
-(1, 'san martin 45', 'Residencial', 1, 9, '-32.414566613131946, -65.00877119828924', '1.26', 1, 'Disponible', 0, 'Casa  de 2 ambientes'),
-(2, 'av Los Mandarinos 566', 'Comercial', 4, 0, '-32.4239588393048, -65.01171109578154', '2.00', 3, 'Disponible', 0, 'Oficina de 250m2'),
-(3, 'Av. Illia 1234', 'Residencial', 2, 0, '-32.35045498578529, -65.01366813627159', '3.00', 1, 'Disponible', 0, 'Local con dependencias, oficina de 12m2'),
-(4, 'Junin 345', 'Comercial', 2, 0, '-32.35045498578529, -65.01366813627159', '4.00', 8, 'Disponible', 0, 'Local 232 metros, con entrepiso  2 baños'),
-(5, 'Junin 345', 'Comercial', 1, 5, '-33.25, -66.36', '55.00', 3, 'Disponible', 0, 'Casa 2 plantas, techo tecja, con cochera 3 autos'),
-(6, 'Junin 345', 'Comercial', 2, 9, '-33.25, -66.36', '2635.52', 3, 'Disponible', 0, 'Dpto 5º piso,  3 dormitorios, uno en suite. '),
-(7, 'Junin 345', 'Comercial', 1, 0, '-33.25, -66.36', '5555.00', 3, 'Disponible', 0, '55dthysh'),
-(8, 'nose', 'Comercial', 2, 0, '-33.25, -66.36', '150000.00', 3, 'Disponible', 0, '6666666666666'),
-(9, 'Junin 345', 'Comercial', 1, 5, '-33.25, -66.36', '5625.00', 3, 'Disponible', 0, 'csa de 2 planta, 3 dormitorios, uno en suite\r\n'),
-(10, 'Junin 345', 'Comercial', 1, 4, '-33.25, -66.36', '666.00', 1, 'Disponible', 0, 'ssaf'),
-(11, 'Av SiempreViva', 'Residencial', 1, 3, '-33.25, -66.36', '5500.00', 1, 'Disponible', 0, 'Casa de 3 ambientes');
+INSERT INTO `inmueble` (`id`, `direccion`, `uso`, `id_tipo`, `ambientes`, `coordenadas`, `precio`, `id_propietario`, `estado`, `borrado`, `descripcion`, `avatarUrl`) VALUES
+(1, 'san martin 45', 'Residencial', 1, 9, '-32.414566613131946, -65.00877119828924', '10000.00', 11, 'Disponible', 0, 'Casa  de 2 ambientes', 'casa1.jpeg'),
+(2, 'av Los Mandarinos 566', 'Comercial', 4, 0, '-32.4239588393048, -65.01171109578154', '20000.00', 11, 'Disponible', 0, 'Oficina de 250m2', 'casa2.jpg'),
+(3, 'Av. Illia 1234', 'Residencial', 2, 0, '-32.35045498578529, -65.01366813627159', '3.00', 1, 'Disponible', 0, 'Local con dependencias, oficina de 12m2', NULL),
+(4, 'Av San Pedro 345 - Villa Mercedes', 'Comercial', 4, 0, '-32.35045498578529, -65.01366813627159', '40000.00', 11, 'Disponible', 0, 'Local 232 metros, con entrepiso  2 baños', 'local1.jpg'),
+(5, 'Junin 345', 'Comercial', 1, 5, '-33.25, -66.36', '55.00', 3, 'Disponible', 0, 'Casa 2 plantas, techo tecja, con cochera 3 autos', NULL),
+(6, 'Junin 345', 'Comercial', 2, 9, '-33.25, -66.36', '2635.52', 3, 'Disponible', 0, 'Dpto 5º piso,  3 dormitorios, uno en suite. ', NULL),
+(7, 'Junin 345', 'Comercial', 1, 0, '-33.25, -66.36', '5555.00', 3, 'Disponible', 0, '55dthysh', NULL),
+(8, 'nose', 'Comercial', 2, 0, '-33.25, -66.36', '150000.00', 3, 'Disponible', 0, '6666666666666', NULL),
+(9, 'Junin 345', 'Comercial', 1, 5, '-33.25, -66.36', '5625.00', 3, 'Disponible', 0, 'csa de 2 planta, 3 dormitorios, uno en suite\r\n', NULL),
+(10, 'Junin 345', 'Comercial', 1, 4, '-33.25, -66.36', '666.00', 1, 'Disponible', 0, 'ssaf', NULL),
+(11, 'Av SiempreViva', 'Residencial', 1, 3, '-33.25, -66.36', '5500.00', 11, 'Disponible', 0, 'Casa de 3 ambientes', 'casa3.jpg'),
+(13, 'el poleo 1430', 'Residencial', 1, 3, '-33,52 -60,27', '1500.00', 11, 'Disponible', 0, 'casa de 3 ambientes', 'casa4.jpg'),
+(15, 'el poleo 1234', 'Comercial', 1, 1, NULL, '10000.00', 11, 'Disponible', 0, 'venta de birra', 'IMG-20240511-WA0029.jpeg'),
+(16, 'Córdoba 123', 'Residencial', 2, 2, NULL, '120000.00', 11, 'Retirado', 0, 'Departamento en el centro', 'IMG-20240519-WA0017.jpg');
 
 -- --------------------------------------------------------
 
@@ -478,32 +454,26 @@ INSERT INTO `inmueble` (`id`, `direccion`, `uso`, `id_tipo`, `ambientes`, `coord
 --
 
 DROP TABLE IF EXISTS `inquilino`;
-CREATE TABLE IF NOT EXISTS `inquilino` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `inquilino` (
+  `id` int(11) NOT NULL,
   `nombre` varchar(45) NOT NULL,
   `apellido` varchar(45) NOT NULL,
   `dni` varchar(11) NOT NULL,
   `email` varchar(45) NOT NULL,
   `telefono` varchar(45) NOT NULL,
-  `borrado` tinyint(1) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `email_UNIQUE` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
-
---
--- RELACIONES PARA LA TABLA `inquilino`:
---
+  `borrado` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `inquilino`
 --
 
 INSERT INTO `inquilino` (`id`, `nombre`, `apellido`, `dni`, `email`, `telefono`, `borrado`) VALUES
-(1, 'Marcelo', 'Jofre', '1256555', 'b1729985-ffa2-11ee-a424-b8aeedb3ac9e', 'b1729993-ffa2-11ee-a424-b8aeedb3ac9e', 0),
-(2, 'Jorge', 'Mendez', '1256555', '905b3f1b-ee14-11ee-8ebc-b8aeedb3ac9e', '905b3f29-ee14-11ee-8ebc-b8aeedb3ac9e', 0),
-(3, 'Natalia', 'Gomez', '1256555', '0f078f6f-ff9f-11ee-a424-b8aeedb3ac9e', '0f078f7c-ff9f-11ee-a424-b8aeedb3ac9e', 0),
-(4, 'Maria Florencia', 'Fernandez', '1256555', 'd3d99b4c-0053-11ef-a424-b8aeedb3ac9e', 'd3d99b62-0053-11ef-a424-b8aeedb3ac9e', 0),
-(6, 'Eduardo', 'Maldonado', '1234567890', 'ajfb@sas', '12345678', 0),
+(1, 'Marcelo', 'Jofre', '1256555', 'marcelo@gmail.com', '2664271471', 0),
+(2, 'Jorge', 'Mendez', '1256555', 'jorge@gmail.com', '2664702741', 0),
+(3, 'Natalia', 'Gomez', '1256555', 'nataly@gmail.com', '265712345', 0),
+(4, 'Maria Florencia', 'Fernandez', '1256555', 'mari_flor@gmail.com', '11339987', 0),
+(6, 'Eduardo', 'Maldonado', '1234567890', 'mail_raro@saas.com', '12345678', 0),
 (7, 'Milton', 'Hersheys', '123456789', 'milton@mail.com', '2664112233', 0);
 
 -- --------------------------------------------------------
@@ -513,43 +483,27 @@ INSERT INTO `inquilino` (`id`, `nombre`, `apellido`, `dni`, `email`, `telefono`,
 --
 
 DROP TABLE IF EXISTS `pago`;
-CREATE TABLE IF NOT EXISTS `pago` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `pago` (
+  `id` int(11) NOT NULL,
   `id_contrato` int(11) NOT NULL,
   `fecha_pago` date NOT NULL DEFAULT current_timestamp(),
   `importe` decimal(11,2) NOT NULL COMMENT 'si es negativo es una nota de credito',
-  `estado` tinyint(2) DEFAULT 0,
+  `estado` tinyint(1) DEFAULT 0,
   `numero_pago` int(10) UNSIGNED NOT NULL DEFAULT 1,
-  `detalle` varchar(150) NOT NULL COMMENT 'aca van los detalles de cada abono -> paga el mes x - abono mes x',
-  `creado_fecha` datetime NOT NULL DEFAULT current_timestamp(),
-  `creado_usuario` int(11) NOT NULL,
-  `editado_usuario` int(2) DEFAULT NULL,
-  `editado_fecha` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_contrato` (`id_contrato`,`numero_pago`),
-  KEY `pago_contrato_idx` (`id_contrato`),
-  KEY `usuario_creado` (`creado_usuario`),
-  KEY `usuario_editado` (`editado_usuario`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
-
---
--- RELACIONES PARA LA TABLA `pago`:
---   `id_contrato`
---       `contrato` -> `id`
---   `creado_usuario`
---       `usuario` -> `id`
---   `editado_usuario`
---       `usuario` -> `id`
---
+  `detalle` varchar(150) NOT NULL COMMENT 'aca van los detalles de cada abono -> paga el mes x - abono mes x'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `pago`
 --
 
-INSERT INTO `pago` (`id`, `id_contrato`, `fecha_pago`, `importe`, `estado`, `numero_pago`, `detalle`, `creado_fecha`, `creado_usuario`, `editado_usuario`, `editado_fecha`) VALUES
-(2, 1, '2024-04-24', '1500.00', 0, 1, 'pago de mayo', '2024-04-24 21:52:00', 1, NULL, NULL),
-(3, 1, '2024-04-24', '1500.00', 0, 2, 'pago adelantado de junio', '2024-04-24 23:10:21', 1, NULL, NULL),
-(4, 1, '2024-04-24', '-500.00', 0, 3, 'Nota de crédito: reposición de un caño ', '2024-04-24 23:11:21', 1, NULL, NULL);
+INSERT INTO `pago` (`id`, `id_contrato`, `fecha_pago`, `importe`, `estado`, `numero_pago`, `detalle`) VALUES
+(2, 1, '2024-04-24', '1500.00', 0, 1, 'pago de mayo'),
+(3, 1, '2024-04-24', '1500.00', 0, 2, 'pago adelantado de junio'),
+(4, 1, '2024-04-24', '-500.00', 0, 3, 'Nota de crédito: reposición de un caño '),
+(7, 1, '2024-05-01', '-1500.00', 0, 4, 'Nota de credito por rotura de puerta'),
+(8, 6, '2024-05-19', '6000.00', 0, 1, 'Pago correspondiente al mes de mayo'),
+(9, 2, '2024-05-23', '23425.00', 0, 1, 'Pago correspondiente al mes en curso');
 
 -- --------------------------------------------------------
 
@@ -558,32 +512,29 @@ INSERT INTO `pago` (`id`, `id_contrato`, `fecha_pago`, `importe`, `estado`, `num
 --
 
 DROP TABLE IF EXISTS `propietario`;
-CREATE TABLE IF NOT EXISTS `propietario` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `propietario` (
+  `id` int(11) NOT NULL,
   `nombre` varchar(45) NOT NULL,
   `apellido` varchar(45) NOT NULL,
   `dni` varchar(45) NOT NULL,
   `email` varchar(100) NOT NULL,
+  `password` varchar(200) DEFAULT NULL,
   `telefono` varchar(45) NOT NULL,
   `borrado` tinyint(1) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `email_UNIQUE` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
-
---
--- RELACIONES PARA LA TABLA `propietario`:
---
+  `avatarUrl` varchar(200) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `propietario`
 --
 
-INSERT INTO `propietario` (`id`, `nombre`, `apellido`, `dni`, `email`, `telefono`, `borrado`) VALUES
-(1, 'Jose', 'Perez', '12345678', '64771466-ff83-11ee-a424-b8aeedb3ac9e', '64771473-ff83-11ee-a424-b8aeedb3ac9e', 0),
-(3, 'Marcelo', 'JOFE', '12345678', '372d0744-ff9d-11ee-a424-b8aeedb3ac9e', '372d0751-ff9d-11ee-a424-b8aeedb3ac9e', 0),
-(8, 'Jose', 'Perez', '12345678', 'aaa@aa.coms', '1234', 0),
-(9, 'Marcelo', 'JOFE', '12345678', 'cbd8df41-faa2-11ee-9c9d-b8aeedb3', 'cbd8df4b-faa2-11ee-9c9d-b8aeedb3', 0),
-(10, 'Pedro', 'Blanco', '12569865', '4bd9ea81-7f90-4358-8b67-2bc6e78f7f16', 'b2944aa0-0053-11ef-a424-b8aeedb3ac9e', 0);
+INSERT INTO `propietario` (`id`, `nombre`, `apellido`, `dni`, `email`, `password`, `telefono`, `borrado`, `avatarUrl`) VALUES
+(1, 'Jose ', 'Perez', '123456789', 'jose@gmail.com', '$2a$11$SQMNFnL3HbnJtQPrj4gp5uiqjWBrAy7huhQ9/qWLYwNu4hHMddqQq', '64771473-ff83-11ee-a424-b8aeedb3ac9e', 0, NULL),
+(3, 'Marcelo', 'JOFE', '12345678', '372d0744-ff9d-11ee-a424-b8aeedb3ac9e', NULL, '372d0751-ff9d-11ee-a424-b8aeedb3ac9e', 0, NULL),
+(8, 'Jose', 'Perez', '12345678', 'aaa@aa.coms', NULL, '1234', 0, NULL),
+(9, 'Marcelo', 'JOFE', '12345678', 'cbd8df41-faa2-11ee-9c9d-b8aeedb3', NULL, 'cbd8df4b-faa2-11ee-9c9d-b8aeedb3', 0, NULL),
+(10, 'Pedro', 'Blanco', '12569865', '4bd9ea81-7f90-4358-8b67-2bc6e78f7f16', NULL, 'b2944aa0-0053-11ef-a424-b8aeedb3ac9e', 0, NULL),
+(11, 'Santiago Leonel', 'Toloza', '38860057', 'leotoloza6@gmail.com', '$2a$11$RFB2rvycLfV0dIhw4ZbS9O91WQ0YZePXLCWTam78N.o8UjNT3sr9m', '1133466839', 0, 'designer.jpeg');
 
 -- --------------------------------------------------------
 
@@ -592,17 +543,11 @@ INSERT INTO `propietario` (`id`, `nombre`, `apellido`, `dni`, `email`, `telefono
 --
 
 DROP TABLE IF EXISTS `tipo_inmueble`;
-CREATE TABLE IF NOT EXISTS `tipo_inmueble` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `tipo_inmueble` (
+  `id` int(11) NOT NULL,
   `tipo` varchar(200) NOT NULL,
-  `borrado` tinyint(1) DEFAULT 0,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `tipo` (`tipo`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
-
---
--- RELACIONES PARA LA TABLA `tipo_inmueble`:
---
+  `borrado` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `tipo_inmueble`
@@ -616,7 +561,8 @@ INSERT INTO `tipo_inmueble` (`id`, `tipo`, `borrado`) VALUES
 (5, 'Cabaña', 0),
 (6, 'Quintas', 0),
 (7, 'hostel', 0),
-(8, 'CAMPING', 0);
+(8, 'CAMPING', 0),
+(11, 'Hotel', 0);
 
 -- --------------------------------------------------------
 
@@ -625,8 +571,8 @@ INSERT INTO `tipo_inmueble` (`id`, `tipo`, `borrado`) VALUES
 --
 
 DROP TABLE IF EXISTS `usuario`;
-CREATE TABLE IF NOT EXISTS `usuario` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `usuario` (
+  `id` int(11) NOT NULL,
   `nombre` varchar(45) NOT NULL,
   `apellido` varchar(45) NOT NULL,
   `dni` varchar(45) NOT NULL,
@@ -635,22 +581,119 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   `rol` enum('usuario','administrador') NOT NULL DEFAULT 'usuario' COMMENT 'solo vamos a usar 2 tipos de usuarios.\\n- usuario normal de la plataforma\\n- un  administrador',
   `avatarUrl` varchar(100) DEFAULT NULL,
   `borrado` tinyint(1) DEFAULT 0 COMMENT '0 para activo, 1 para inactivo',
-  `update_at` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE current_timestamp(),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COMMENT='tabla para usuarios internos del sistema';
-
---
--- RELACIONES PARA LA TABLA `usuario`:
---
+  `update_at` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='tabla para usuarios internos del sistema';
 
 --
 -- Volcado de datos para la tabla `usuario`
 --
 
 INSERT INTO `usuario` (`id`, `nombre`, `apellido`, `dni`, `email`, `password`, `rol`, `avatarUrl`, `borrado`, `update_at`) VALUES
-(1, 'Leonel', 'Toloza', '123456789', 'admin@admin.com', '$2a$11$..jMfFLHoPD4mkiDz6neX.80LhpUwcIwkSZtKrlB1lX4z6k4T9Jw2', 'administrador', 'Designer.jpeg', 0, '2024-04-25 11:55:52'),
-(2, 'Santiago Leonel', 'Toloza', '987654321', 'leotoloza6@gmail.com', '$2a$11$IYzzl8cwybgKg7dAe/URhO9qZXGXAUtcqZXrkpHnjahqzGzJoQDuG', 'usuario', NULL, 0, '2024-04-25 11:58:13'),
+(1, 'Leonel', 'Toloza', '123456789', 'admin@admin.com', '$2a$11$IYzzl8cwybgKg7dAe/URhO9qZXGXAUtcqZXrkpHnjahqzGzJoQDuG', 'administrador', 'Designer.jpeg', 0, '2024-05-04 14:19:44'),
+(2, 'Santiago Leonel', 'Toloza', '987654321', 'leotoloza6@gmail.com', '$2a$11$IYzzl8cwybgKg7dAe/URhO9qZXGXAUtcqZXrkpHnjahqzGzJoQDuG', 'administrador', NULL, 0, '2024-05-04 14:17:18'),
 (3, 'Rafael ', 'Lopez', '123456', 'lopezrafa@gmail.com', '$2a$11$zujeCmTH/ewXdFu738wpqur5i69oPqLpIam6vGtLmHRdr55zft.m6', 'administrador', NULL, 0, '2024-04-25 10:31:20');
+
+--
+-- Índices para tablas volcadas
+--
+
+--
+-- Indices de la tabla `contrato`
+--
+ALTER TABLE `contrato`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `contrato_inmueble_idx` (`id_inmueble`),
+  ADD KEY `contrato_inquilino_idx` (`id_inquilino`),
+  ADD KEY `fecha_inicio` (`fecha_inicio`,`fecha_fin`);
+
+--
+-- Indices de la tabla `inmueble`
+--
+ALTER TABLE `inmueble`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `inmueble_tipo_idx` (`id_tipo`),
+  ADD KEY `propietario_inmueble_idx` (`id_propietario`);
+
+--
+-- Indices de la tabla `inquilino`
+--
+ALTER TABLE `inquilino`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email_UNIQUE` (`email`);
+
+--
+-- Indices de la tabla `pago`
+--
+ALTER TABLE `pago`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id_contrato` (`id_contrato`,`numero_pago`),
+  ADD KEY `pago_contrato_idx` (`id_contrato`);
+
+--
+-- Indices de la tabla `propietario`
+--
+ALTER TABLE `propietario`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email_UNIQUE` (`email`);
+
+--
+-- Indices de la tabla `tipo_inmueble`
+--
+ALTER TABLE `tipo_inmueble`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `tipo` (`tipo`);
+
+--
+-- Indices de la tabla `usuario`
+--
+ALTER TABLE `usuario`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+
+--
+-- AUTO_INCREMENT de la tabla `contrato`
+--
+ALTER TABLE `contrato`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT de la tabla `inmueble`
+--
+ALTER TABLE `inmueble`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT de la tabla `inquilino`
+--
+ALTER TABLE `inquilino`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT de la tabla `pago`
+--
+ALTER TABLE `pago`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT de la tabla `propietario`
+--
+ALTER TABLE `propietario`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT de la tabla `tipo_inmueble`
+--
+ALTER TABLE `tipo_inmueble`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT de la tabla `usuario`
+--
+ALTER TABLE `usuario`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Restricciones para tablas volcadas
@@ -669,14 +712,6 @@ ALTER TABLE `contrato`
 ALTER TABLE `inmueble`
   ADD CONSTRAINT `inmueble_tipo` FOREIGN KEY (`id_tipo`) REFERENCES `tipo_inmueble` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `propietario_inmueble` FOREIGN KEY (`id_propietario`) REFERENCES `propietario` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `pago`
---
-ALTER TABLE `pago`
-  ADD CONSTRAINT `pago_contrato` FOREIGN KEY (`id_contrato`) REFERENCES `contrato` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `usuario_creado` FOREIGN KEY (`creado_usuario`) REFERENCES `usuario` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `usuario_editado` FOREIGN KEY (`editado_usuario`) REFERENCES `usuario` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
