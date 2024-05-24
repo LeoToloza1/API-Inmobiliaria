@@ -132,32 +132,7 @@ namespace inmobiliaria.Models
             return Ok(inmuebleExistente);
         }
 
-        [HttpDelete("borrar/{id}")]
-        public ActionResult<Inmueble> Delete(int id)
-        {//elimina solo el usuario logueado
-            var userId = User.FindFirst("id")?.Value;
-            var inmueble = repositorioInmueble.BuscarPorId(id);
-            if (inmueble == null || inmueble.PropietarioId.ToString() != userId)
-            {
-                return NotFound();
-            }
-            var exito = repositorioInmueble.EliminadoLogico(id);
-            if (!exito)
-            {
-                return StatusCode(500, "Error al eliminar");
-            }
-            return NoContent();
-        }
-        [HttpGet("propietario/{id}")]
-        public ActionResult<List<Inmueble>> GetPropietario(int id)
-        {
-            var inmuebles = repositorioInmueble.InmueblesDePropietario(id);
-            if (inmuebles == null)
-            {
-                return NotFound();
-            }
-            return inmuebles;
-        }
+
         [HttpPatch("actualizar/avatar/{id}")]
         public ActionResult<Inmueble> CambiarAvatar(int id, IFormFile avatarFile)
         {

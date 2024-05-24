@@ -55,48 +55,25 @@ namespace inmobiliaria.Repositorios
                 return false;
             }
         }
-
-        public bool EliminadoLogico(int id)
-        {
-            try
-            {
-                var inmueble = _contexto.Inmueble.FirstOrDefault(i => i.id == id);
-                if (inmueble != null)
-                {
-                    inmueble.borrado = true;
-                    _contexto.SaveChanges();
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error al eliminar lógicamente el inmueble: {ex.Message}");
-                return false;
-            }
-        }
-        public List<Inmueble> ObtenerTodos()
+        public List<Inmueble> InmueblesDePropietario(int propietarioId)
         {
             var inmuebles = _contexto.Inmueble
-                            .Include(i => i.tipoInmueble)
-                            .Include(i => i.propietario)
-                            .ToList();
+       .Where(i => i.PropietarioId == propietarioId)
+       .Include(i => i.propietario)
+       .Include(i => i.tipoInmueble)
+       .ToList();
+            foreach (var inmueble in inmuebles)
+            {
+#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+                inmueble.propietario.password = null;
+#pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
+
+            }
+
             return inmuebles;
         }
 
-        public List<Inmueble> InmueblesDePropietario(int propietarioId)
-        {
-            return _contexto.Inmueble
-                .Where(i => i.PropietarioId == propietarioId)
-                .Include(i => i.propietario)
-                .Include(i => i.tipoInmueble)
-                .ToList();
-        }
 
-        public List<Inmueble> ObtenerActivos()
-        {
-            return _contexto.Inmueble.Where(i => !i.borrado).ToList();
-        }
         public bool CambiarAvatar(int inmuebleId, string nuevoAvatar)
         {
             try
@@ -140,11 +117,17 @@ namespace inmobiliaria.Repositorios
         {
 
             var inmueblesAlquilados = _contexto.Inmueble
+       .Where(i => i.PropietarioId == propietarioId)
+       .Include(i => i.propietario)
+       .Include(i => i.tipoInmueble)
+       .ToList();
+            foreach (var inmueble in inmueblesAlquilados)
+            {
+#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+                inmueble.propietario.password = null;
+#pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
 
-                .Where(i => i.PropietarioId == propietarioId)
-                .Include(i => i.propietario)
-                .Include(i => i.tipoInmueble)
-                .ToList();
+            }
 
             return inmueblesAlquilados;
         }

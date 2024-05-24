@@ -52,8 +52,6 @@ namespace inmobiliaria.Controllers
         [HttpGet]
         public IActionResult LogOut()
         {
-            HttpContext.Session.Clear();
-            HttpContext.Response.Cookies.Delete("jwt");
             return Ok("Sesión cerrada");
         }
     }

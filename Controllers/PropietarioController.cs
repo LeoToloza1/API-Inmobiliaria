@@ -55,6 +55,7 @@ namespace inmobiliaria.Models
             propietarioExistente.apellido = propietario.apellido ?? propietarioExistente.apellido;
             propietarioExistente.dni = propietario.dni ?? propietarioExistente.dni;
             propietarioExistente.telefono = propietario.telefono ?? propietarioExistente.telefono;
+            propietarioExistente.email = propietario.email ?? propietarioExistente.email;
 
             bool exito = repositorioPropietario.Actualizar(propietarioExistente);
             if (!exito)
