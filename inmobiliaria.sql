@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 24-05-2024 a las 01:00:54
+-- Tiempo de generación: 24-05-2024 a las 04:03:12
 -- Versión del servidor: 10.4.25-MariaDB
 -- Versión de PHP: 8.1.10
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `inmobiliaria`
 --
+CREATE DATABASE IF NOT EXISTS `inmobiliaria` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `inmobiliaria`;
 
 DELIMITER $$
 --
@@ -444,8 +446,9 @@ INSERT INTO `inmueble` (`id`, `direccion`, `uso`, `id_tipo`, `ambientes`, `coord
 (10, 'Junin 345', 'Comercial', 1, 4, '-33.25, -66.36', '666.00', 1, 'Disponible', 0, 'ssaf', NULL),
 (11, 'Av SiempreViva', 'Residencial', 1, 3, '-33.25, -66.36', '5500.00', 11, 'Disponible', 0, 'Casa de 3 ambientes', 'casa3.jpg'),
 (13, 'el poleo 1430', 'Residencial', 1, 3, '-33,52 -60,27', '1500.00', 11, 'Disponible', 0, 'casa de 3 ambientes', 'casa4.jpg'),
-(15, 'el poleo 1234', 'Comercial', 1, 1, NULL, '10000.00', 11, 'Disponible', 0, 'venta de birra', 'IMG-20240511-WA0029.jpeg'),
-(16, 'Córdoba 123', 'Residencial', 2, 2, NULL, '120000.00', 11, 'Retirado', 0, 'Departamento en el centro', 'IMG-20240519-WA0017.jpg');
+(15, 'el poleo 1234', 'Comercial', 1, 1, NULL, '10000.00', 11, 'Retirado', 0, 'venta de birra', 'IMG-20240511-WA0029.jpeg'),
+(16, 'Córdoba 123', 'Residencial', 2, 2, NULL, '120000.00', 11, 'Retirado', 0, 'Departamento en el centro', 'IMG-20240519-WA0017.jpg'),
+(17, 'Calle Falsa 123', 'Comercial', 5, 2, NULL, '150000.00', 11, 'Disponible', 0, 'cabaña para 2 personas ', 'images.jpeg');
 
 -- --------------------------------------------------------
 
@@ -503,7 +506,8 @@ INSERT INTO `pago` (`id`, `id_contrato`, `fecha_pago`, `importe`, `estado`, `num
 (4, 1, '2024-04-24', '-500.00', 0, 3, 'Nota de crédito: reposición de un caño '),
 (7, 1, '2024-05-01', '-1500.00', 0, 4, 'Nota de credito por rotura de puerta'),
 (8, 6, '2024-05-19', '6000.00', 0, 1, 'Pago correspondiente al mes de mayo'),
-(9, 2, '2024-05-23', '23425.00', 0, 1, 'Pago correspondiente al mes en curso');
+(9, 2, '2024-05-23', '23425.00', 0, 1, 'Pago correspondiente al mes en curso'),
+(10, 6, '2024-05-23', '2500.00', 0, 2, 'pago adelantado de junio');
 
 -- --------------------------------------------------------
 
@@ -534,7 +538,8 @@ INSERT INTO `propietario` (`id`, `nombre`, `apellido`, `dni`, `email`, `password
 (8, 'Jose', 'Perez', '12345678', 'aaa@aa.coms', NULL, '1234', 0, NULL),
 (9, 'Marcelo', 'JOFE', '12345678', 'cbd8df41-faa2-11ee-9c9d-b8aeedb3', NULL, 'cbd8df4b-faa2-11ee-9c9d-b8aeedb3', 0, NULL),
 (10, 'Pedro', 'Blanco', '12569865', '4bd9ea81-7f90-4358-8b67-2bc6e78f7f16', NULL, 'b2944aa0-0053-11ef-a424-b8aeedb3ac9e', 0, NULL),
-(11, 'Santiago Leonel', 'Toloza', '38860057', 'leotoloza6@gmail.com', '$2a$11$RFB2rvycLfV0dIhw4ZbS9O91WQ0YZePXLCWTam78N.o8UjNT3sr9m', '1133466839', 0, 'designer.jpeg');
+(11, 'Santiago Leonel ', 'Toloza', '38860000', 'leotoloza6@gmail.com', '$2a$11$Wy8BaHYuiw0ody7A0S9nJObKWUjIfTcRz.4FGLATMaq4uhF8vxLSO', '1133466839', 0, 'designer.jpeg'),
+(12, 'Usuario', 'Prueba', '123456789', 'prueba@gmail.com', '$2a$11$IYzzl8cwybgKg7dAe/URhO9qZXGXAUtcqZXrkpHnjahqzGzJoQDuG', '123456789', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -663,7 +668,7 @@ ALTER TABLE `contrato`
 -- AUTO_INCREMENT de la tabla `inmueble`
 --
 ALTER TABLE `inmueble`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de la tabla `inquilino`
@@ -675,13 +680,13 @@ ALTER TABLE `inquilino`
 -- AUTO_INCREMENT de la tabla `pago`
 --
 ALTER TABLE `pago`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `propietario`
 --
 ALTER TABLE `propietario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `tipo_inmueble`
